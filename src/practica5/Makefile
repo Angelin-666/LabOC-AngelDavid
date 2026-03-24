@@ -7,6 +7,6 @@ run:
 
 builda: 
 	nasm -f elf p5a.asm
-	ld -m elf_i386 p5.o -o ../../bin/practica5a.exe ../../lib/libpc_io.a
+	ld -m elf_i386 p5a.o -o ../../bin/practica5a.exe ../../lib/libpc_io.a
 runa:
 	./../../bin/practica5a.exe
