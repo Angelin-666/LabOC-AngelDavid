@@ -8,10 +8,9 @@ _start:
     mov edx, msg        ; edx = dirección de la cadena msg
     call puts       ; imprime cadena msg terminada en valor nulo (0)
 
-    ; Direccionamiento indirecto por registro
-    mov esi, msg      ; ESI apunta al inicio de msg
-    add esi, 23       ; desplazamiento hasta 'x'
-    mov byte [esi], 'X'
+    ; Registro + desplazamiento
+    mov esi, msg
+    mov byte [esi + 26], '@'
 
     ; Imprime cadena modificada
     mov edx, msg
