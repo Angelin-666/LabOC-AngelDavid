@@ -5,32 +5,52 @@ global _start
 
 _start:
 
+    mov esi, 0          ; índice i = 0
+    mov ecx, 5          ; capturar 5 números
+
+captura_loop:
+
     ; Mensaje
     mov edx, msg
     call puts
 
     ; Captura cadena
     mov edx, cad
-    mov ax, 6
+    mov ax, 8
     call capturar
 
     ; ATOI
     mov edx, cad
-    call atoi
-    mov ebx, eax        ; guardar entero convertido
+    call atoi                   ; EAX = número convertido
+
+    mov [nums + esi*4], eax     ; guardar entero convertido en nums[i]
+
+    inc esi
+    loop captura_loop
+
+    ; Ordenar los números (menor a mayor)
+    call ordenar_burbuja
+
+    ; Mostrar números ordenados
+    mov esi, 0
+    mov ecx, 5
+
+print_loop:
+    mov eax, [nums + esi*4]     ; cargar número ordenado
 
     ; ITOA
-    mov eax, ebx        ; número entero con signo
-    mov edx, outcad     ; buffer salida
-    mov ecx, 16         ; longitud buffer
+    mov edx, outcad             ; buffer salida
+    mov ecx, 12                 ; longitud buffer
     call itoa
 
     ; Mostrar resultado
-    mov al, 0x0A
-    call putchar
     mov edx, outcad
     call puts
+    mov al, 0x0A
     call putchar
+
+    inc esi
+    loop print_loop
 
     ; Fin
     xor ebx, ebx
@@ -38,9 +58,11 @@ _start:
     int 0x80
 
 
+
 ; CAPTURAR
 ; EDX → buffer
 ; AX  → máximo caracteres
+
 
 capturar:
     push eax
@@ -67,9 +89,11 @@ capturar:
     ret
 
 
+
 ; ATOI
 ; EDX → inicio cadena
 ; RET: EAX → entero con signo
+
 
 atoi:
     push ebx
@@ -108,8 +132,8 @@ atoi:
 
     imul eax, eax, 10   ; eax *= 10
     sub cl, '0'         ; convertir ASCII → número
-    movzx ecx, cl       ; limpiar ECX
-    add eax, ecx        ; eax += dígito
+    movzx ecx, cl
+    add eax, ecx
 
     inc edx
     jmp .conv
@@ -123,11 +147,13 @@ atoi:
     ret
 
 
+
 ; ITOA
 ; EAX → entero
 ; EDX → buffer
 ; ECX → longitud
 ; RET: EDX → inicio cadena
+
 
 itoa:
     push eax
@@ -173,7 +199,51 @@ itoa:
     pop eax
     ret
 
+
+; ordenar_burbuja
+; Ordena 5 enteros con signo (menor a mayor)
+
+
+ordenar_burbuja:
+    push eax
+    push ebx
+    push ecx
+    push esi
+
+    mov ecx, 4           ; 4 pasadas
+
+.outer_loop:
+    mov esi, 0
+
+.inner_loop:
+    mov eax, [nums + esi*4]
+    mov ebx, [nums + esi*4 + 4]
+
+    cmp eax, ebx
+    jle .no_swap
+
+    mov [nums + esi*4], ebx
+    mov [nums + esi*4 + 4], eax
+
+.no_swap:
+    inc esi
+    cmp esi, ecx
+    jl .inner_loop
+
+    dec ecx
+    jnz .outer_loop
+
+    pop esi
+    pop ecx
+    pop ebx
+    pop eax
+    ret
+
+
 section .data
-msg     db 0x0A,"Ingresa un numero maximo 5 digitos: ",0
-cad     times 5 db 0
-outcad  times 5 dd 0
+msg     db 0x0A,"Ingresa un numero (max 5 digitos): ",0
+
+cad     times 8  db 0     ; cadena de entrada (signo + 5 digitos + \0)
+outcad  times 12 db 0     ; cadena de salida para ITOA
+
+nums    times 5  dd 0     ; arreglo de 5 ENTEROS
