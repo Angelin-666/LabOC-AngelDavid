@@ -1,87 +1,130 @@
-%include "../../lib/pc_io.inc"  	; incluir declaraciones de procedimiento externos
-								; que se encuentran en la biblioteca libpc_io.a
+%include "../../lib/pc_io.inc"
 
-section	.text
-	global _start       ;referencia para inicio de programa
-	
-_start:                   
+section .text
+    global _start
 
-    call getch
-    call itoa
-    mov edx,ncad
+_start:
+
+    ; Mensaje
+    mov edx, msg
     call puts
 
-    
-
-    mov bx,word[len]
-    mov edx,cad
+    ; Captura
+    mov edx, cad       ; destino de la cadena
+    mov ax, 64         ; máximo incluyendo nulo
     call capturar
-    mov al,[nlin]
+
+    ; Salto de línea
+    mov al, 0x0A
     call putchar
+
+    ; Cadena original
+    mov edx, cad
     call puts
 
-    mov al,[nlin]
+    ; MAYÚSCULAS
+    mov edx, cad
+    call mayusculas
+    mov al, 0x0A
     call putchar
+    mov edx, cad
+    call puts
+
+    ; MINÚSCULAS
+    mov edx, cad
+    call minusculas
+    mov al, 0x0A
     call putchar
+    mov edx, cad
+    call puts
 
-	mov	eax, 1	    	; seleccionar llamada al sistema para fin de programa
-	int	0x80        	; llamada al sistema - fin de programa
+    ; Fin
+    mov eax, 1
+    int 0x80
 
-    capturar:
-        push edx
-        push cx
-        mov cx,bx
-        dec cx
-    .ciclo: 
-        call getch
-        cmp al,127
-        jne .guardar
-        call borrar
-        jmp .ciclo
-       .guardar:
-        call putchar
-        mov [edx],al
-        cmp al,0xa
-        je .salir
-        inc edx
-        loop .ciclo
+; =========================
+; Procedimiento: CAPTURAR
+; EDX -> inicio de cadena
+; AX  -> máximo caracteres
+; =========================
+capturar:
+    push eax
+    push ecx
+    push edx
 
-        .salir:
-        mov byte[edx],0
-        pop cx
-        pop edx
-        ret
+    mov cx, ax
+    dec cx              ; reservar espacio para '\0'
 
-    borrar:
-        push ax 
-        mov al,0x8
-        call putchar    
-        mov al,' '
-        call putchar
-        mov al,0x8
-        call putchar   
-        pop ax
-        ret 
+.ciclo:
+    call getch
+    cmp al, 0x0A        ; Enter
+    je .fin
 
-    itoa:
-        push bx
-        mov bl,100
-        mov ah,0
-        div bl
-        mov bx,ax
-        add al,'0'
-        call putchar
-        mov al,ah
-        add al,'0'
-        call putchar
+    mov [edx], al
+    call putchar
+    inc edx
+    loop .ciclo
+
+.fin:
+    mov byte [edx], 0   ; carácter nulo
+
+    pop edx
+    pop ecx
+    pop eax
+    ret
+
+; Procedimiento: MAYÚSCULAS
+
+mayusculas:
+    push eax
+.recorre:
+    mov al, [edx]
+    cmp al, 0
+    je .salir
+
+    cmp al, 'a'
+    jl .sigue
+    cmp al, 'z'
+    jg .sigue
+
+    sub al, 32          ; a → A
+    mov [edx], al
+
+.sigue:
+    inc edx
+    jmp .recorre
+
+.salir:
+    pop eax
+    ret
 
 
+; Procedimiento: MINÚSCULAS
 
-        pop bx
-        ret
-section	.data
-    ncad db 0xa,'Cadena: ',0
-    nlin db 0xa
-    len db 64
-    cad	times 64 db 0
+minusculas:
+    push eax
+.recorre:
+    mov al, [edx]
+    cmp al, 0
+    je .salir
 
+    cmp al, 'A'
+    jl .sigue
+    cmp al, 'Z'
+    jg .sigue
+
+    add al, 32          ; A → a
+    mov [edx], al
+
+.sigue:
+    inc edx
+    jmp .recorre
+
+.salir:
+    pop eax
+    ret
+
+section .data
+    msg db 0x0A, "Captura una cadena:", 0
+    cad times 64 db 0
+``
