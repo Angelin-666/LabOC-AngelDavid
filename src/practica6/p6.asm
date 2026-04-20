@@ -39,6 +39,8 @@ _start:
     call puts
 
     ; Fin
+    mov al, 0x0A
+    call putchar
     mov eax, 1
     int 0x80
 
