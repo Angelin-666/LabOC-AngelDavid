@@ -14,6 +14,12 @@ captura_loop:
     mov edx, msg
     call puts
 
+    ; ---- LIMPIAR BUFFER DE ENTRADA ----
+    mov edi, cad
+    mov ecx, 8
+    xor al, al
+    rep stosb
+
     ; Captura cadena
     mov edx, cad
     mov ax, 8
@@ -23,24 +29,35 @@ captura_loop:
     mov edx, cad
     call atoi                   ; EAX = número convertido
 
-    mov [nums + esi*4], eax     ; guardar entero convertido en nums[i]
+    mov [nums + esi*4], eax     ; guardar entero convertido
 
     inc esi
-    loop captura_loop
+    mov ecx, 5
+    sub ecx, esi
+    jnz captura_loop
 
+    
+    mov al, 0x0A
+    call putchar
+
+
+    ; ------------------------------
     ; Ordenar los números (menor a mayor)
+    ; ------------------------------
     call ordenar_burbuja
 
+    ; ------------------------------
     ; Mostrar números ordenados
+    ; ------------------------------
     mov esi, 0
-    mov ecx, 5
+    mov edi, 5                  ; contador seguro
 
 print_loop:
-    mov eax, [nums + esi*4]     ; cargar número ordenado
+    mov eax, [nums + esi*4]
 
     ; ITOA
-    mov edx, outcad             ; buffer salida
-    mov ecx, 12                 ; longitud buffer
+    mov edx, outcad
+    mov ecx, 12
     call itoa
 
     ; Mostrar resultado
@@ -50,7 +67,8 @@ print_loop:
     call putchar
 
     inc esi
-    loop print_loop
+    dec edi
+    jnz print_loop
 
     ; Fin
     xor ebx, ebx
@@ -58,11 +76,11 @@ print_loop:
     int 0x80
 
 
-
+; -------------------------------------------------
 ; CAPTURAR
 ; EDX → buffer
 ; AX  → máximo caracteres
-
+; -------------------------------------------------
 
 capturar:
     push eax
@@ -89,21 +107,20 @@ capturar:
     ret
 
 
-
+; -------------------------------------------------
 ; ATOI
 ; EDX → inicio cadena
 ; RET: EAX → entero con signo
-
+; -------------------------------------------------
 
 atoi:
     push ebx
     push ecx
     push edx
 
-    xor eax, eax        ; acumulador
-    mov ebx, 1          ; signo = +
+    xor eax, eax
+    mov ebx, 1
 
-; ignorar espacios
 .espacios:
     mov cl, [edx]
     cmp cl, ' '
@@ -130,8 +147,8 @@ atoi:
     cmp cl, '9'
     jg .fin
 
-    imul eax, eax, 10   ; eax *= 10
-    sub cl, '0'         ; convertir ASCII → número
+    imul eax, eax, 10
+    sub cl, '0'
     movzx ecx, cl
     add eax, ecx
 
@@ -139,7 +156,7 @@ atoi:
     jmp .conv
 
 .fin:
-    imul eax, ebx       ; aplicar signo
+    imul eax, ebx
 
     pop edx
     pop ecx
@@ -147,13 +164,9 @@ atoi:
     ret
 
 
-
+; -------------------------------------------------
 ; ITOA
-; EAX → entero
-; EDX → buffer
-; ECX → longitud
-; RET: EDX → inicio cadena
-
+; -------------------------------------------------
 
 itoa:
     push eax
@@ -162,8 +175,7 @@ itoa:
     push esi
     push edi
 
-    mov edi, edx        ; guardar inicio real del buffer
-
+    mov edi, edx
     lea esi, [edx + ecx - 1]
     mov byte [esi], 0
 
@@ -200,9 +212,9 @@ itoa:
     ret
 
 
+; -------------------------------------------------
 ; ordenar_burbuja
-; Ordena 5 enteros con signo (menor a mayor)
-
+; -------------------------------------------------
 
 ordenar_burbuja:
     push eax
@@ -210,7 +222,7 @@ ordenar_burbuja:
     push ecx
     push esi
 
-    mov ecx, 4           ; 4 pasadas
+    mov ecx, 4
 
 .outer_loop:
     mov esi, 0
@@ -243,7 +255,6 @@ ordenar_burbuja:
 section .data
 msg     db 0x0A,"Ingresa un numero (max 5 digitos): ",0
 
-cad     times 8  db 0     ; cadena de entrada (signo + 5 digitos + \0)
-outcad  times 12 db 0     ; cadena de salida para ITOA
-
-nums    times 5  dd 0     ; arreglo de 5 ENTEROS
+cad     times 8  db 0
+outcad  times 12 db 0
+nums    times 5  dd 0
