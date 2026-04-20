@@ -127,4 +127,3 @@ minusculas:
 section .data
     msg db 0x0A, "Captura una cadena:", 0
     cad times 64 db 0
-``
