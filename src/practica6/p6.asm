@@ -42,11 +42,10 @@ _start:
     mov eax, 1
     int 0x80
 
-; =========================
-; Procedimiento: CAPTURAR
+;CAPTURAR
 ; EDX -> inicio de cadena
 ; AX  -> máximo caracteres
-; =========================
+
 capturar:
     push eax
     push ecx
