@@ -175,5 +175,5 @@ itoa:
 
 section .data
 msg     db 0x0A,"Ingresa un numero maximo 5 digitos: ",0
-cad     times 64 db 0
-outcad  times 16 db 0
+cad     times 5 db 0
+outcad  times 5 dd 0
