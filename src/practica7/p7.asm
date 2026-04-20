@@ -30,6 +30,7 @@ _start:
     call putchar
     mov edx, outcad
     call puts
+    call putchar
 
     ; Fin
     xor ebx, ebx
