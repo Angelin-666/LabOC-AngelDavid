@@ -4,7 +4,7 @@ section .text
     global _start
 
 _start:
-
+;agregar tope!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     ; Mensaje
     mov edx, msg
     call puts
