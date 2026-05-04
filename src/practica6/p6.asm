@@ -98,7 +98,6 @@ capturar:
     dec edx
     mov byte [edx], 0
 
-    ; borrar visualmente: BS SPACE BS
     mov al, 0x08
     call putchar
     mov al, ' '
