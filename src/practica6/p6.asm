@@ -48,31 +48,42 @@ _start:
 ; EDX -> inicio de cadena
 ; AX  -> máximo caracteres
 
+
 capturar:
     push eax
     push ecx
     push edx
+    push edi
 
+    mov edi, edx        ; guardar inicio del buffer
     mov cx, ax
-    dec cx              ; reservar espacio para '\0'
+    dec cx              ; espacio para '\0'
 
 .ciclo:
     call getch
-    cmp al, 0x0A        ; Enter
-    je .fin
+    cmp al, 0x0A        ; ENTER
+    je .enter
 
     mov [edx], al
     call putchar
     inc edx
     loop .ciclo
+    jmp .fin
+
+.enter:
+    cmp edx, edi        
+    je .ciclo           ; ignorar ENTER
+    jmp .fin
 
 .fin:
     mov byte [edx], 0   ; carácter nulo
 
+    pop edi
     pop edx
     pop ecx
     pop eax
     ret
+
 
 ; Procedimiento: MAYÚSCULAS
 
