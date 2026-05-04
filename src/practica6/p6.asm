@@ -4,7 +4,7 @@ section .text
     global _start
 
 _start:
-;agregar tope!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+;agregar tope para backspace!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     ; Mensaje
     mov edx, msg
     call puts
@@ -49,6 +49,7 @@ _start:
 ; AX  -> máximo caracteres
 
 
+
 capturar:
     push eax
     push ecx
@@ -61,22 +62,54 @@ capturar:
 
 .ciclo:
     call getch
-    cmp al, 0x0A        ; ENTER
+
+    ; -------- ENTER --------
+    cmp al, 0x0A
     je .enter
+
+    ; ------ BACKSPACE ------
+    
+    cmp al, 0x08
+    je .backspace
+    cmp al, 0x7F
+    je .backspace
+
+
+    ; ---- carácter normal ----
+    cmp cx, 0          
+    je .ciclo           ; ignorar
 
     mov [edx], al
     call putchar
     inc edx
-    loop .ciclo
-    jmp .fin
+    dec cx
+    jmp .ciclo
 
 .enter:
     cmp edx, edi        
-    je .ciclo           ; ignorar ENTER
+    je .ciclo           ;ignorar ENTER
     jmp .fin
 
+.backspace:
+    cmp edx, edi        
+    je .ciclo           ;no hacer nada
+
+    inc cx              ;recuperamos espacio
+    dec edx
+    mov byte [edx], 0
+
+    ; borrar visualmente: BS SPACE BS
+    mov al, 0x08
+    call putchar
+    mov al, ' '
+    call putchar
+    mov al, 0x08
+    call putchar
+
+    jmp .ciclo
+
 .fin:
-    mov byte [edx], 0   ; carácter nulo
+    mov byte [edx], 0   ; fin de cadena
 
     pop edi
     pop edx
