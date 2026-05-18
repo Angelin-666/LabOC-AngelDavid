@@ -108,4 +108,3 @@ sumatoria:
 .fin:
     pop ebp
     ret
-``
