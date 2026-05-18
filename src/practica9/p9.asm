@@ -1,110 +1,148 @@
+; p9.asm  (NASM, ELF 32-bit)
+; Funciones para ser llamadas desde C (gcc -m32)
+
 global maximo, minimo, sumatoria
 
 section .text
 
-; -----------------------------
-; MACRO FOR
-; -----------------------------
-%macro FOR 4
+
+%macro FOR 5
     push ecx
     push edx
-
-    mov ecx, %1        ; contador
-    mov edx, %2        ; índice/base
-
-.%4:
+    mov  ecx, %1
+    mov  edx, %2
+.%5:
     call %3
-    loop .%4
-
-    pop edx
-    pop ecx
+    add  edx, %4
+    loop .%5
+    pop  edx
+    pop  ecx
 %endmacro
 
-
-; =====================================================
-; MAXIMO
+; ============================================================
 ; int maximo(int *arr, int len)
-; =====================================================
+;   retorna el valor máximo
+; ============================================================
 maximo:
     push ebp
-    mov ebp, esp
+    mov  ebp, esp
+    push ebx
+    push esi
+    push edi
 
-    mov esi, [ebp+8]      ; arr
-    mov ecx, [ebp+12]     ; len
+    mov esi, [ebp+8]     ; esi = arr
+    mov edi, [ebp+12]    ; edi = len
 
-    mov eax, [esi]        ; max = arr[0]
-    mov edi, 1            ; i = 1
+    ; si len <= 0, retorna 0 (por seguridad)
+    cmp edi, 0
+    jg  .ok
+    xor eax, eax
+    jmp .fin
 
-.loop_max:
-    cmp edi, ecx
-    jge .fin
+.ok:
+    mov eax, [esi]       ; max = arr[0]
 
-    mov ebx, [esi + edi*4]
-    cmp ebx, eax
-    jle .skip
-    mov eax, ebx
+    ; si len == 1, ya está
+    cmp edi, 1
+    jle .fin
 
-.skip:
-    inc edi
-    jmp .loop_max
+    ; iterar desde i=1, count = len-1
+    mov ecx, edi
+    dec ecx
+    FOR ecx, 1, .step_max, 1, LMAX
 
 .fin:
+    pop edi
+    pop esi
+    pop ebx
     pop ebp
     ret
 
+.step_max:
+    ; usa: esi=base, edx=i, eax=max actual
+    mov ebx, [esi + edx*4]
+    cmp ebx, eax
+    jle .ret
+    mov eax, ebx
+.ret:
+    ret
 
-; =====================================================
-; MINIMO
-; =====================================================
+
+; ============================================================
+; int minimo(int *arr, int len)
+;   retorna el valor mínimo
+; ============================================================
 minimo:
     push ebp
-    mov ebp, esp
+    mov  ebp, esp
+    push ebx
+    push esi
+    push edi
 
-    mov esi, [ebp+8]
-    mov ecx, [ebp+12]
+    mov esi, [ebp+8]     ; arr
+    mov edi, [ebp+12]    ; len
 
-    mov eax, [esi]        ; min = arr[0]
-    mov edi, 1
+    cmp edi, 0
+    jg  .ok
+    xor eax, eax
+    jmp .fin
 
-.loop_min:
-    cmp edi, ecx
-    jge .fin
+.ok:
+    mov eax, [esi]       ; min = arr[0]
 
-    mov ebx, [esi + edi*4]
-    cmp ebx, eax
-    jge .skip
-    mov eax, ebx
+    cmp edi, 1
+    jle .fin
 
-.skip:
-    inc edi
-    jmp .loop_min
+    mov ecx, edi
+    dec ecx
+    FOR ecx, 1, .step_min, 1, LMIN
 
 .fin:
+    pop edi
+    pop esi
+    pop ebx
     pop ebp
     ret
 
+.step_min:
+    mov ebx, [esi + edx*4]
+    cmp ebx, eax
+    jge .ret
+    mov eax, ebx
+.ret:
+    ret
 
-; =====================================================
-; SUMATORIA
-; =====================================================
+
+; ============================================================
+; int sumatoria(int *arr, int len)
+;   retorna suma de elementos
+; ============================================================
 sumatoria:
     push ebp
-    mov ebp, esp
+    mov  ebp, esp
+    push ebx
+    push esi
+    push edi
 
-    mov esi, [ebp+8]
-    mov ecx, [ebp+12]
+    mov esi, [ebp+8]     ; arr
+    mov edi, [ebp+12]    ; len
 
-    xor eax, eax        ; suma = 0
-    xor edi, edi        ; i = 0
+    xor eax, eax         ; suma = 0
 
-.loop_sum:
-    cmp edi, ecx
-    jge .fin
+    cmp edi, 0
+    jle .fin
 
-    add eax, [esi + edi*4]
-    inc edi
-    jmp .loop_sum
+    ; iterar i=0..len-1 (count=len)
+    mov ecx, edi
+    FOR ecx, 0, .step_sum, 1, LSUM
 
 .fin:
+    pop edi
+    pop esi
+    pop ebx
     pop ebp
+    ret
+
+.step_sum:
+    add eax, [esi + edx*4]
     ret

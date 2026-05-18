@@ -9,14 +9,13 @@ int main() {
     int n = 5;
 
     printf("Captura 5 numeros:\n");
-
-    for(int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         printf("Elemento %d: ", i);
         scanf("%d", &arr[i]);
     }
 
     printf("\nArreglo:\n");
-    for(int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         printf("%d ", arr[i]);
     }
 
