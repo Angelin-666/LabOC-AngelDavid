@@ -82,29 +82,75 @@ print_loop:
 ; AX  → máximo caracteres
 ; -------------------------------------------------
 
+
 capturar:
     push eax
     push ecx
     push edx
+    push edi
 
+    mov edi, edx        ; guardar inicio del buffer
     mov cx, ax
-    dec cx
+    dec cx              ; dejar espacio para '\0'
 
 .ciclo:
     call getch
+
+    ;ENTER
     cmp al, 0x0A
-    je .fin
+    je .enter
+
+    ;BACKSPACE
+    cmp al, 0x08
+    je .backspace
+    cmp al, 0x7F
+    je .backspace
+
+    ;carácter normal
+    cmp cx, 0
+    je .ciclo           ; si ya no hay espacio, ignorar y seguir leyendo
+
     mov [edx], al
     call putchar
     inc edx
-    loop .ciclo
+    dec cx
+    jmp .ciclo
+
+.enter:
+    ;ignorar ENTER
+    cmp edx, edi
+    je .ciclo
+    jmp .fin
+
+.backspace:
+    ; si estamos al inicio del buffer, no hacer nada
+    cmp edx, edi
+    je .ciclo
+
+    ; retroceder un carácter
+    inc cx              ; recupera espacio disponible
+    dec edx
+    mov byte [edx], 0
+
+    ; borrar visualmente: BS, espacio, BS
+    mov al, 0x08
+    call putchar
+    mov al, ' '
+    call putchar
+    mov al, 0x08
+    call putchar
+
+    jmp .ciclo
 
 .fin:
-    mov byte [edx], 0
+    mov byte [edx], 0   ; terminar cadena
+
+    pop edi
     pop edx
     pop ecx
     pop eax
     ret
+
 
 
 ; -------------------------------------------------
