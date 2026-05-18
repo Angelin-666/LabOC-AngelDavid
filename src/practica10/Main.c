@@ -7,7 +7,7 @@ extern unsigned char get_bit(unsigned char value, unsigned char bit);
 
 void update_temp(int *temps){
     for(int i = 0; i < 2; i++){
-        int cambio = (rand() % 11) - 5; // [-5,5]
+        int cambio = (rand() % 11) - 5;
         temps[i] += cambio;
     }
 }
@@ -23,21 +23,28 @@ void update_flags(int *temps,int *last,unsigned char *flags){
         if(diff > 2)  set_bit(&flags[i], 3);   // G
         if(diff < 0)  set_bit(&flags[i], 4);   // D
         if(diff > 0)  set_bit(&flags[i], 5);   // U
-
-        last[i] = temps[i];
     }
 }
 
-void print_status(int *temps,unsigned char *flags){
+void print_status(int *temps, int *last){
     for(int i = 0; i < 2; i++){
+        int diff = temps[i] - last[i];
+
         printf("SENSOR %d: ~ %d °C ", i+1, temps[i]);
 
-        if(get_bit(flags[i],0)) printf("- ");
-        else if(get_bit(flags[i],4)) printf("< ");
-        else if(get_bit(flags[i],2)) printf("<< ");
-        else if(get_bit(flags[i],3)) printf("<<< ");
-        else if(get_bit(flags[i],1)) printf("> ");
-        else if(get_bit(flags[i],5)) printf(">> ");
+        if(diff == 0){
+            printf("- ");
+        }
+        else if(diff > 0){
+            if(diff == 1) printf("> ");
+            else if(diff == 2) printf(">> ");
+            else printf(">>> ");
+        }
+        else{
+            if(diff == -1) printf("< ");
+            else if(diff == -2) printf("<< ");
+            else printf("<<< ");
+        }
 
         printf("\n");
     }
@@ -62,8 +69,14 @@ int main(){
 
         if(op == 1){
             update_temp(temps);
-            update_flags(temps,last,flags);
-            print_status(temps,flags);
+
+            print_status(temps, last);   // ✅ CORRECTO
+
+            update_flags(temps, last, flags);
+
+            for(int i = 0; i < 2; i++){
+                last[i] = temps[i];      // ✅ después de imprimir
+            }
         }
 
     }while(op != 2);
