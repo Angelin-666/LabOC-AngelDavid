@@ -1,0 +1,131 @@
+SWITCH,     INPUT
+            STORE OPC
+
+CASE1,      LOAD OPC
+            SUBT UNO
+            SKIPCOND 400
+            JUMP CASE2
+            JnS CAPTURAR
+            JUMP SWITCH
+
+CASE2,      LOAD OPC
+            SUBT DOS
+            SKIPCOND 400
+            JUMP CASE3
+            JnS SHIFT_IZQ
+            LOAD SHL_R
+            OUTPUT
+            JUMP SWITCH
+
+CASE3,      LOAD OPC
+            SUBT TRES
+            SKIPCOND 400
+            JUMP CASE4
+            JnS SHIFT_DER
+            LOAD SHR_R
+            OUTPUT
+            JUMP SWITCH
+
+CASE4,      LOAD OPC
+            SUBT CUATRO
+            SKIPCOND 400
+            JUMP SWITCH
+            HALT
+
+
+
+CAPTURAR,   HEX 000
+            INPUT
+            STORE SH_A
+            INPUT
+            STORE SH_B
+            JUMPI CAPTURAR
+
+
+/SHIFT IZQUIERDA
+/SHL_R = SH_A << SH_B
+
+SHIFT_IZQ,  HEX 000
+
+            LOAD SH_A
+            STORE SHL_R
+
+            LOAD SH_B
+            STORE CONT
+
+LOOP_SHL,   LOAD CONT
+            SKIPCOND 400
+            JUMP CALC_SHL
+            JUMP FIN_SHL
+
+CALC_SHL,   LOAD SHL_R
+            ADD SHL_R
+            STORE SHL_R
+
+            LOAD CONT
+            SUBT UNO
+            STORE CONT
+
+            JUMP LOOP_SHL
+
+FIN_SHL,    JUMPI SHIFT_IZQ
+
+
+/SHIFT DERECHA
+/SHR_R = SH_A >> SH_B
+
+SHIFT_DER,  HEX 000
+
+            LOAD SH_A
+            STORE SHR_R
+
+            LOAD SH_B
+            STORE CONT
+
+LOOP_SHR,   LOAD CONT
+            SKIPCOND 400
+            JUMP DIVIDE
+            JUMP FIN_SHR
+
+DIVIDE,     LOAD SHR_R
+            STORE TEMP
+            CLEAR
+            STORE SHR_R
+
+DIV_LOOP,   LOAD TEMP
+            SUBT DOS
+            SKIPCOND 000
+			JUMP CONT_DIV
+            JUMP END_DIV
+
+CONT_DIV,	STORE TEMP
+            LOAD SHR_R
+            ADD UNO
+            STORE SHR_R
+            JUMP DIV_LOOP
+
+END_DIV,    LOAD CONT
+            SUBT UNO
+            STORE CONT
+            JUMP LOOP_SHR
+
+FIN_SHR,    JUMPI SHIFT_DER
+
+
+/VARIABLES
+
+OPC,        DEC 0
+
+SH_A,       DEC 0
+SH_B,       DEC 0
+
+SHL_R,      DEC 0
+SHR_R,      DEC 0
+
+CONT,       DEC 0
+TEMP,       DEC 0
+
+UNO,        DEC 1
+DOS,        DEC 2
+TRES,       DEC 3
+CUATRO,     DEC 4

@@ -1,0 +1,147 @@
+SWITCH,     INPUT
+            STORE OPC
+
+CASE1,      LOAD OPC
+            SUBT UNO
+            SKIPCOND 400
+            JUMP CASE2
+            JnS CAPTURAR
+            JUMP SWITCH
+
+CASE2,      LOAD OPC
+            SUBT DOS
+            SKIPCOND 400
+            JUMP CASE3
+            JnS MULT_OPT
+            LOAD R
+            OUTPUT
+            JUMP SWITCH
+
+CASE3,      LOAD OPC
+            SUBT TRES
+            SKIPCOND 400
+            JUMP CASE4
+            JnS POTENCIA
+            LOAD R
+            OUTPUT
+            JUMP SWITCH
+
+CASE4,      LOAD OPC
+            SUBT CUATRO
+            SKIPCOND 400
+            JUMP SWITCH
+            HALT
+
+
+
+CAPTURAR,   HEX 000
+            INPUT
+            STORE A
+            INPUT
+            STORE B
+            JUMPI CAPTURAR
+
+
+
+MULT_OPT,   HEX 000
+            LOAD A
+            SUBT B
+            SKIPCOND 000
+            JUMP MULT_AB
+            JUMP MULT_BA
+
+
+
+MULT_AB,    LOAD CERO
+            STORE R
+            STORE I
+
+FOR_AB,     LOAD I
+            SUBT B
+            SKIPCOND 000
+            JUMP FIN_MULT
+            LOAD R
+            ADD A
+            STORE R
+            LOAD I
+            ADD UNO
+            STORE I
+            JUMP FOR_AB
+
+
+
+MULT_BA,    LOAD CERO
+            STORE R
+            STORE I
+
+FOR_BA,     LOAD I
+            SUBT A
+            SKIPCOND 000
+            JUMP FIN_MULT
+            LOAD R
+            ADD B
+            STORE R
+            LOAD I
+            ADD UNO
+            STORE I
+            JUMP FOR_BA
+
+
+
+FIN_MULT,   JUMPI MULT_OPT
+
+
+POTENCIA,   HEX 000
+
+            LOAD A
+            STORE AUX2      / guardar base original
+
+            LOAD B
+            STORE EXP       / guardar exponente original
+
+            LOAD UNO
+            STORE R         / R = 1
+
+            LOAD CERO
+            STORE J         / J = 0
+
+FOR_POT,    LOAD J
+            SUBT EXP
+            SKIPCOND 000
+            JUMP FIN_POT
+
+            LOAD R
+            STORE AUX
+
+            LOAD AUX2
+            STORE A
+
+            LOAD AUX
+            STORE B
+
+            JnS MULT_OPT
+
+            LOAD J
+            ADD UNO
+            STORE J
+
+            JUMP FOR_POT
+
+FIN_POT,    JUMPI POTENCIA
+
+
+EXP, 	 DEC 0
+OPC,     DEC 0
+A,       DEC 0
+B,       DEC 0
+R,       DEC 0
+I,       DEC 0
+J,       DEC 0
+TEMP,    DEC 0
+AUX,     DEC 0
+AUX2,    DEC 0
+UNO,     DEC 1
+DOS,     DEC 2
+TRES,    DEC 3
+CUATRO,  DEC 4
+CERO,    DEC 0

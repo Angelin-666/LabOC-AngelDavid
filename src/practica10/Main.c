@@ -70,12 +70,12 @@ int main(){
         if(op == 1){
             update_temp(temps);
 
-            print_status(temps, last);   // ✅ CORRECTO
+            print_status(temps, last);  
 
             update_flags(temps, last, flags);
 
             for(int i = 0; i < 2; i++){
-                last[i] = temps[i];      // ✅ después de imprimir
+                last[i] = temps[i];      
             }
         }
 

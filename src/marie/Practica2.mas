@@ -1,0 +1,169 @@
+SWITCH,     INPUT
+            STORE OPC
+
+CASE1,      LOAD OPC
+            SUBT UNO
+            SKIPCOND 400
+            JUMP CASE2
+            JnS MINUS
+            JUMP SWITCH
+
+CASE2,      LOAD OPC
+            SUBT DOS
+            SKIPCOND 400
+            JUMP CASE3
+            JnS MAYUS
+            JUMP SWITCH
+
+CASE3,      LOAD OPC
+            SUBT TRES
+            SKIPCOND 400
+            JUMP CASE4
+            JnS MOSTRAR
+            JUMP SWITCH
+
+CASE4,      LOAD OPC
+            SUBT CUATRO
+            SKIPCOND 400
+            JUMP SWITCH
+            HALT
+
+
+
+MINUS,      HEX 000
+            LOAD INICIO_CADENA
+            STORE PTR
+
+LOOP_MIN,   LOADI PTR
+            SKIPCOND 400
+            JUMP CHECK_MIN
+            JUMP FIN_MIN
+
+CHECK_MIN,  STORE CHAR
+
+            LOAD CHAR
+            SUBT A_MAY
+            SKIPCOND 000
+            JUMP CHECK_Z_MIN
+            JUMP NEXT_MIN
+
+CHECK_Z_MIN,LOAD CHAR
+            SUBT Z_MAY
+            SKIPCOND 800
+            JUMP CONVERT_MIN
+            JUMP NEXT_MIN
+
+CONVERT_MIN,LOAD CHAR
+            ADD TREINTA_DOS
+            STOREI PTR
+
+NEXT_MIN,   LOAD PTR
+            ADD UNO
+            STORE PTR
+            JUMP LOOP_MIN
+
+FIN_MIN,    JUMPI MINUS
+
+
+
+MAYUS,      HEX 000
+            LOAD INICIO_CADENA
+            STORE PTR
+
+LOOP_MAY,   LOADI PTR
+            SKIPCOND 400
+            JUMP CHECK_MAY
+            JUMP FIN_MAY
+
+CHECK_MAY,  STORE CHAR
+            LOAD CHAR
+            SUBT A_MIN
+            SKIPCOND 000
+            JUMP CHECK_Z_MAY
+            JUMP NEXT_MAY
+
+CHECK_Z_MAY,LOAD CHAR
+            SUBT Z_MIN
+            SKIPCOND 800
+            JUMP CONVERT_MAY
+            JUMP NEXT_MAY
+
+CONVERT_MAY,LOAD CHAR
+            SUBT TREINTA_DOS
+            STOREI PTR
+
+NEXT_MAY,   LOAD PTR
+            ADD UNO
+            STORE PTR
+            JUMP LOOP_MAY
+
+FIN_MAY,    JUMPI MAYUS
+
+
+
+MOSTRAR,    HEX 000
+            LOAD INICIO_CADENA
+            STORE PTR
+
+LOOP_MOST,  LOADI PTR
+            SKIPCOND 400
+            JUMP PRINT_CHAR
+            JUMP FIN_MOST
+
+PRINT_CHAR, OUTPUT
+            LOAD PTR
+            ADD UNO
+            STORE PTR
+            JUMP LOOP_MOST
+
+FIN_MOST,   JUMPI MOSTRAR
+
+
+
+OPC,            DEC 0
+PTR,            HEX 0
+CHAR,           DEC 0
+
+UNO,            DEC 1
+DOS,            DEC 2
+TRES,           DEC 3
+CUATRO,         DEC 4
+TREINTA_DOS,    DEC 32
+
+A_MAY,          DEC 65
+Z_MAY,          DEC 90
+A_MIN,          DEC 97
+Z_MIN,          DEC 122
+
+INICIO_CADENA,  ADR CADENA
+
+CADENA,         DEC 79
+                DEC 114
+                DEC 71
+                DEC 97
+                DEC 110
+                DEC 105
+                DEC 90
+                DEC 97
+                DEC 99
+                DEC 105
+                DEC 79
+                DEC 110
+                DEC 32
+                DEC 100
+                DEC 101
+                DEC 32
+                DEC 67
+                DEC 111
+                DEC 109
+                DEC 112
+                DEC 117
+                DEC 116
+                DEC 97
+                DEC 100
+                DEC 111
+                DEC 114
+                DEC 97
+                DEC 115
+                DEC 10
+                DEC 00
